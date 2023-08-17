@@ -1,11 +1,11 @@
 {
   "manifest_version": 3,
   "name": "Keiba tenkijp",
-  "version": "1.0",
+  "version": "1.1",
   "icons": {
     "128": "128.png"
   },
-  "description": "This extension for racecorse in tenki.jp.",
+  "description": "This extension for racecourses in tenki.jp.",
   "content_scripts": [{
     "matches": [
       "https://tenki.jp/leisure/horse/*"
