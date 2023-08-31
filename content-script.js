@@ -43,11 +43,11 @@ const rc_code = [
   '8/42/32941', '8/41/32940', '9/43/32942', '9/43/32943', '9/44/32944', //高知C,松山,小倉C,久留米,武雄
   '9/45/32945', '9/47/32946', '9/46/32947' ];				//佐世保,別府,熊本
 const am_code = [
-   "1/2/14163",  "1/4/23281", "2/10/36127", "4/18/54236", "3/16/44116", //札幌,函館,福島,新潟,東京
-  "3/15/45106", "5/26/51216", "6/29/61326", "6/30/62051", "9/43/82056", //中山,中京,京都,阪神,小倉
-   "1/4/22141",  "2/6/33431",  "2/6/33781", "3/14/43241", "3/15/45106", //門別,盛岡,水沢,浦和,船橋
-  "3/16/44166", "3/16/44166", "4/20/56227", "5/24/52586", "5/27/53041", //大井,川崎,金沢,笠松,名古屋
-  "6/30/62051", "6/31/63383", "8/42/74182", "9/43/82306",  "1/3/20432"  //園田,姫路,高知,佐賀,帯広
+   '1/2/14163',  '1/4/23281', '2/10/36127', '4/18/54236', '3/16/44116', //札幌,函館,福島,新潟,東京
+  '3/15/45106', '5/26/51216', '6/29/61326', '6/30/62051', '9/43/82056', //中山,中京,京都,阪神,小倉
+   '1/4/22141',  '2/6/33431',  '2/6/33781', '3/14/43241', '3/15/45106', //門別,盛岡,水沢,浦和,船橋
+  '3/16/44166', '3/16/44166', '4/20/56227', '5/24/52586', '5/27/53041', //大井,川崎,金沢,笠松,名古屋
+  '6/30/62051', '6/31/63383', '8/42/74182', '9/43/82306',  '1/3/20432'  //園田,姫路,高知,佐賀,帯広
   ];
 
 const rc = [
@@ -77,19 +77,32 @@ const rc_wdir = [
   r07,    l09,    r14,    l13,    l07,    r10,    l15,    r13,    r10,    r09,
   r01,    r01,    r10,    r11,    r01 ];
 const name = [ '競馬場', '競艇場', '競輪場' ];
-const base = [  0,       25,       49 ];
-const num  = [ 25,       24,       43 ];
+const base = [  0,       25,       49       ];
+const num  = [ 25,       24,       43       ];
 const prefix = '/leisure/horse/';
+const liteprefix = '/lite/leisure/horse/';
 const am_prefix = '/amedas/';
 const am_suffix = '.html';
 
 //他場リンクリスト作成
-const create_link = (code, suffix, type, uls, index) => {
-  const ul_ml = document.createElement('ul');
-  ul_ml.classList.add("migration-list");
+const create_link = (code, suffix, type, uls, index, lite) => {
+  var div_mw;
+  var ul_ml;
+
+  if (!lite) {
+    ul_ml = document.createElement('ul');
+    ul_ml.classList.add('migration-list');
+  }
+  else {
+    div_mw = document.createElement('div');
+    div_mw.classList.add('migration-wrap');
+  }
 
   var p = document.createElement('p');
-  p.classList.add("title");
+  if (!lite)
+    p.classList.add('title');
+  else
+    p.classList.add('migration-title');
   p.textContent = name[type];
   if (type < 1) {
     var a = document.createElement('a');
@@ -102,40 +115,102 @@ const create_link = (code, suffix, type, uls, index) => {
     a.appendChild(img);
     p.appendChild(a);
   }
-  ul_ml.appendChild(p);
+  if (!lite)
+    ul_ml.appendChild(p);
+  else
+    div_mw.appendChild(p);
 
-  const cols = Math.ceil(num[type] / 13);
-  const rows = Math.ceil(num[type] / cols);
-  for (var x = 0; x < rows; x++) {
-    var li = document.createElement('li');
-    for (var y = 0; y < cols; y++) {
-      if (cols * x + y < num[type]) {
-	if (y > 0)
-	  li.appendChild(document.createElement('br'));
-	var a = document.createElement('a');
-        a.href = prefix + rc_code[base[type] + cols * x + y] + '/' + suffix;
-	if (code == rc_code[base[type] + cols * x + y])
-	  a.classList.add("selected");
-	a.id = 'horse-text-link_' + rc_code[base[type] + cols * x + y].replace(/\d+\/\d+\//, '');
-	a.textContent = rc[base[type] + cols * x + y];
-	li.appendChild(a);
+  if (!lite) {
+    const cols = Math.ceil(num[type] / 13);
+    const rows = Math.ceil(num[type] / cols);
+
+    for (var x = 0; x < rows; x++) {
+      var li = document.createElement('li');
+      for (var y = 0; y < cols; y++) {
+	if (cols * x + y < num[type]) {
+	  if (y > 0)
+	    li.appendChild(document.createElement('br'));
+	  var a = document.createElement('a');
+          a.href = prefix + rc_code[base[type] + cols * x + y] + '/' + suffix;
+	  if (code == rc_code[base[type] + cols * x + y])
+	    a.classList.add('selected');
+	  a.id = 'horse-text-link_' + rc_code[base[type] + cols * x + y].replace(/\d+\/\d+\//, '');
+	  a.textContent = rc[base[type] + cols * x + y];
+	  li.appendChild(a);
+        }
       }
+      ul_ml.appendChild(li);
     }
-    ul_ml.appendChild(li);
+  }
+  else {
+    const rows = Math.ceil((num[type] - 10) / 10);
+    const cols = Math.ceil((num[type] - 10) / rows);
+
+    ul_ml = document.createElement('ul');
+    ul_ml.classList.add('migration-list');
+    for (var x = 0; x < 10; x++) {
+      var li = document.createElement('li');
+      var a = document.createElement('a');
+      a.href = liteprefix + rc_code[base[type] + x] + '/' + suffix;
+      if (code == rc_code[base[type] + x])
+	a.classList.add('selected');
+      a.id = 'horse-text-link_' + rc_code[base[type] + x].replace(/\d+\/\d+\//, '');
+      a.textContent = rc[base[type] + x];
+      li.appendChild(a);
+      ul_ml.appendChild(li);
+    }
+    div_mw.appendChild(ul_ml);
+    var details = document.createElement('details');
+    details.classList.add('migration-box');
+    var summary = document.createElement('summary');
+    summary.classList.add('migration-open');
+    details.appendChild(summary);
+    ul_ml = document.createElement('ul');
+    ul_ml.classList.add('migration-list');
+    ul_ml.classList.add('open');
+    for (var x = 0; x < cols; x++) {
+      var li = document.createElement('li');
+      for (var y = 0; y < rows; y++) {
+	if (10 + rows * x + y < num[type]) {
+	  if (y > 0)
+	    li.appendChild(document.createElement('br'));
+	  var a = document.createElement('a');
+          a.href = liteprefix + rc_code[base[type] + 10 + rows * x + y] + '/' + suffix;
+	  if (code == rc_code[base[type] + 10 + rows * x + y])
+	    a.classList.add('selected');
+	  a.id = 'horse-text-link_' + rc_code[base[type] + 10 + rows * x + y].replace(/\d+\/\d+\//, '');
+	  a.textContent = rc[base[type] + 10 + rows * x + y];
+	  li.appendChild(a);
+        }
+      }
+      ul_ml.appendChild(li);
+    }
+    details.appendChild(ul_ml);
+    div_mw.appendChild(details);
   }
 
   for (const ul of uls)
     if (ul.className == 'forecast-select-btn clearfix')
-      ul.before(ul_ml);
+      if (!lite)
+	ul.before(ul_ml);
+      else
+        ul.before(div_mw);
 }
 
 window.addEventListener('DOMContentLoaded', event => {
   //pathname解析
-  const pathname2 = window.location.pathname.replace(prefix, '');
-  const code = pathname2.replace(/\/[^/]*$/, '');
-  const index = rc_code.indexOf(code);
-  if (index < 0)
-    return; //競馬場、競艇場、競輪場以外は非対応
+  var lite = false
+  var pathname2 = window.location.pathname.replace(prefix, '');
+  var code = pathname2.replace(/\/[^/]*$/, '');
+  var index = rc_code.indexOf(code);
+  if (index < 0) {
+    pathname2 = window.location.pathname.replace(liteprefix, '');
+    code = pathname2.replace(/\/[^/]*$/, '');
+    index = rc_code.indexOf(code);
+    if (index < 0)
+      return; //競馬場、競艇場、競輪場以外は非対応
+    lite = true;
+  }
   const suffix = pathname2.replace(/[\d\/]+\//, '');
   let type = 0; //競馬場
   if (index >= base[1]) {
@@ -147,22 +222,50 @@ window.addEventListener('DOMContentLoaded', event => {
 
   //「他の競馬場の天気」更新・追加
   const uls = document.querySelectorAll('ul');
-  for (const ul of uls)
-    if (ul.className == 'migration-list')
-      ul.remove();
-  create_link(code, suffix, type, uls, index);
+  if (!lite) {
+    for (const ul of uls)
+      if (ul.className == 'migration-list')
+        ul.remove();
+  }
+  else {
+    const divs = document.querySelectorAll('div');
+    for (const div of divs)
+      if (div.className == 'migration-wrap')
+        div.remove();
+  }
+  create_link(code, suffix, type, uls, index, lite);
   if (type >= 1)
     return; //競馬場以外はここまで
 
   //ヘッダの風向に回りを追加
-  const ths = document.querySelectorAll('.wind-blow,.wind-direction th');
-  for (const th of ths)
-    th.innerHTML = th.innerHTML.replace(/(風向)/g, '<br>$1<br>' + turn[rc_turn[index]] + '回直線');
+  if (!lite) {
+    const ths = document.querySelectorAll('.wind-blow,.wind-direction th');
+    for (const th of ths)
+      th.innerHTML = th.innerHTML.replace(/(風向)/g, '<br>$1<br>' + turn[rc_turn[index]] + '回直線');
+  }
+  else {
+    const ths = document.querySelectorAll('.entry-index,.wind-direction th');
+    for (const th of ths)
+      th.innerHTML = th.innerHTML.replace(/(風向)/g, '$1<br>' + turn[rc_turn[index]] + '回直線');
+  }
 
   //データの直線風向を追加
-  const tds = document.querySelectorAll('.wind-blow,.wind-direction td');
-  for (const td of tds) {
-    const ps = td.querySelectorAll('p');
+  if (!lite) {
+    const tds = document.querySelectorAll('.wind-blow,.wind-direction td');
+    for (const td of tds) {
+      const ps = td.querySelectorAll('p');
+      for (const p of ps) {
+	const dir_index = dir.indexOf(p.textContent);
+	if (dir_index >= 0) {
+	  var p2 = p.cloneNode(true);
+	  p2.textContent = wdir[rc_wdir[index][dir_index]];
+	  p.after(p2);
+	}
+      }
+    }
+  }
+  else {
+    const ps = document.querySelectorAll('.wind-direction p');
     for (const p of ps) {
       const dir_index = dir.indexOf(p.textContent);
       if (dir_index >= 0) {
